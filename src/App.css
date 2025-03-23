@@ -1,60 +1,86 @@
 .App {
   text-align: center;
-  padding: 20px;
+  font-family: Arial, sans-serif;
   max-width: 800px;
   margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 20px;
 }
 
 .scanner-video {
-  width: 300px;
-  height: 300px;
-  border: 2px solid #333;
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border: 2px solid #ddd;
   border-radius: 8px;
-  margin: 20px 0;
+  margin-bottom: 20px;
 }
 
-.scan-button {
-  background: #007bff;
-  color: white;
+.button-container {
+  text-align: center; /* Center the button */
+}
+
+.start-scan-button {
+  background-color: #4CAF50; /* Green */
   border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
   font-size: 16px;
-  transition: background 0.3s;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 20px; /* Add spacing above the button */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+  transition: background-color 0.3s ease; /* Smooth hover effect */
 }
 
-.scan-button:hover {
-  background: #0056b3;
+.start-scan-button:hover {
+  background-color: #45a049; /* Darker green on hover */
 }
 
 .result-container {
-  margin-top: 30px;
-  padding: 20px;
-  background: #f8f9fa;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
   border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.result-container h2 {
+  color: #333;
 }
 
 .result-output {
-  background: white;
-  padding: 15px;
-  border-radius: 5px;
-  text-align: left;
-  white-space: pre-wrap;
-  word-wrap: break-word;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 10px;
+  white-space: pre-wrap; /* Preserve line breaks */
+  word-break: break-word; /* Break long words */
+  text-align: left; /* Align text to the left */
+  font-family: monospace;
+  font-size: 14px;
+  min-height: 50px;
 }
 
-.scan-again {
-  background: #28a745;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 15px;
-}
+@media (max-width: 600px) {
+  .App {
+    padding: 10px;
+  }
 
-.scan-again:hover {
-  background: #218838;
+  .scanner-video {
+    max-width: 100%;
+  }
+
+  .start-scan-button {
+    width: 100%;
+    padding: 12px;
+  }
 }
 

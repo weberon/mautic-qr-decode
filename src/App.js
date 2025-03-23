@@ -123,7 +123,6 @@ function App() {
                     console.log("Extracted URL from QR code:", url);
                     const processedResult = processUrl(url);
                     setResult(processedResult);
-                    // Don't stop the scanner, it will continue scanning for the next QR code
                 } else {
                     console.error("Invalid QR code data:", result);
                     setResult("Error: Invalid QR code data format");
@@ -155,11 +154,13 @@ function App() {
     return (
         <div className="App">
             <h1>QR Code Processor</h1>
-            <video ref={videoRef} className="scanner-video" />
+            <video ref={videoRef} className="scanner-video" muted playsInline />
             {!isScanning && (
-                <button className="start-scan-button" onClick={handleStartScanning}>
-                    Start Scanning
-                </button>
+                <div className="button-container">
+                    <button className="start-scan-button" onClick={handleStartScanning}>
+                        Start Scanning
+                    </button>
+                </div>
             )}
             <div className="result-container">
                 <h2>Lead Value:</h2>
