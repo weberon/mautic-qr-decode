@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import QrScanner from "qr-scanner";
 import './App.css';
 
@@ -71,6 +71,7 @@ function phpUnserialize(data) {
 
 function App() {
     const [result, setResult] = useState("");
+    const [isScanning, setIsScanning] = useState(false);
     const videoRef = useRef(null);
     const scannerRef = useRef(null);
 
@@ -95,7 +96,6 @@ function App() {
             const deserialized = phpUnserialize(decoded);
             console.log("PHP deserialized:", deserialized);
 
-            // Extract the "lead" value
             if (typeof deserialized === 'object' && 'lead' in deserialized) {
                 return deserialized.lead.toString();
             } else {
@@ -108,9 +108,12 @@ function App() {
     };
 
     const startScanner = () => {
-        if (scannerRef.current) scannerRef.current.stop();
+        if (scannerRef.current) {
+            scannerRef.current.start();
+            return;
+        }
 
-        const scanner = new QrScanner(
+        scannerRef.current = new QrScanner(
             videoRef.current,
             (result) => {
                 console.log("QR Code scanned. Raw result:", result);
@@ -120,42 +123,50 @@ function App() {
                     console.log("Extracted URL from QR code:", url);
                     const processedResult = processUrl(url);
                     setResult(processedResult);
+                    // Don't stop the scanner, it will continue scanning for the next QR code
                 } else {
                     console.error("Invalid QR code data:", result);
                     setResult("Error: Invalid QR code data format");
                 }
-                scanner.stop();
             },
-            {
-                highlightScanRegion: true,
-                highlightCodeOutline: true,
-            }
+            { highlightScanRegion: true, highlightCodeOutline: true }
         );
 
-        scanner.start();
-        scannerRef.current = scanner;
+        scannerRef.current.start();
     };
+
+    const handleStartScanning = () => {
+        setIsScanning(true);
+        startScanner();
+    };
+
+    useEffect(() => {
+        if (isScanning) {
+            startScanner();
+        }
+        return () => {
+            if (scannerRef.current) {
+                scannerRef.current.destroy();
+                scannerRef.current = null;
+            }
+        };
+    }, [isScanning]);
 
     return (
         <div className="App">
             <h1>QR Code Processor</h1>
             <video ref={videoRef} className="scanner-video" />
-            <div>
-                <button className="scan-button" onClick={startScanner}>
+            {!isScanning && (
+                <button className="start-scan-button" onClick={handleStartScanning}>
                     Start Scanning
                 </button>
-            </div>
-            {result && (
-                <div className="result-container">
-                    <h2>Lead Value:</h2>
-                    <pre className="result-output">
-                        {result}
-                    </pre>
-                    <button className="scan-again" onClick={() => setResult("")}>
-                        Scan Next Code
-                    </button>
-                </div>
             )}
+            <div className="result-container">
+                <h2>Lead Value:</h2>
+                <pre className="result-output">
+                    {result || "Waiting for QR code..."}
+                </pre>
+            </div>
         </div>
     );
 }
