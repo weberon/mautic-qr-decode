@@ -113,7 +113,8 @@ function App() {
                     host: urlObj.host,
                     path: urlObj.pathname,
                     params: Object.fromEntries(urlObj.searchParams.entries()),
-                    fullUrl: url
+                    fullUrl: url,
+                    deserialized: deserialized  // Include the full deserialized data
                 };
             } else {
                 throw new Error("'lead' key not found in deserialized data");
@@ -196,7 +197,11 @@ function App() {
                         </button>
                         {expanded && (
                             <div className="full-url expanded">
-                                <div>Path: {result.path}</div>
+                                <div>Deserialized Data:</div>
+                                {Object.entries(result.deserialized).map(([key, value]) => (
+                                    <div key={key}>{key}: {JSON.stringify(value)}</div>
+                                ))}
+                                <div style={{marginTop: '10px'}}>Path: {result.path}</div>
                                 {Object.entries(result.params).map(([key, value]) => 
                                     key !== 'ct' && <div key={key}>{key}: {value}</div>
                                 )}
