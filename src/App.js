@@ -168,7 +168,7 @@ function App() {
 
     return (
         <div className="App">
-            <h1>QR Code Processor</h1>
+            <h2>Decode QR Code</h2>
             <video ref={videoRef} className="scanner-video" muted playsInline />
             {!isScanning && (
                 <div className="button-container">
