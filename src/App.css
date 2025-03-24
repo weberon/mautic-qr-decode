@@ -3,8 +3,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between; /* Spread elements vertically */
-  height: 100vh; /* Full viewport height */
+  justify-content: space-between;
+  height: 100vh;
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 10px;
@@ -15,38 +15,38 @@
 h1 {
   color: #333;
   margin-bottom: 10px;
-  font-size: 20px; /* Adjusted for mobile screens */
+  font-size: 20px;
 }
 
 /* QR Scanner Video */
 .scanner-video {
   width: 100%;
-  max-width: 400px; /* Limit width on larger screens */
-  max-height: 50%; /* Limit height to half of the screen */
+  max-width: 400px;
+  max-height: 50%;
   border: 2px solid #ddd;
   border-radius: 8px;
 }
 
 /* Button Container */
 .button-container {
-  text-align: center; /* Center the button */
+  text-align: center;
 }
 
 /* Start Scanning Button */
 .start-scan-button {
-  background-color: #4CAF50; /* Green */
+  background-color: #4CAF50;
   border: none;
   color: white;
-  padding: 10px 20px; /* Reduced padding for smaller screens */
-  font-size: 14px; /* Smaller font size for mobile */
+  padding: 10px 20px;
+  font-size: 14px;
   cursor: pointer;
   border-radius: 5px;
-  margin-top: 10px; /* Add spacing above button */
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  margin-top: 10px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .start-scan-button:hover {
-  background-color: #45a049; /* Darker green on hover */
+  background-color: #45a049;
 }
 
 /* Result Container */
@@ -55,7 +55,7 @@ h1 {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 10px;
-  width: calc(100% - 20px); /* Full width with some padding on sides */
+  width: calc(100% - 20px);
 }
 
 .result-container h2 {
@@ -66,24 +66,31 @@ h1 {
   background-color: #fff;
   border-radius: 4px;
   padding: 10px;
-  white-space: pre-wrap; /* Preserve line breaks */
-  word-break: break-word; /* Break long words */
-  text-align: left; /* Align text to the left */
+  white-space: pre-wrap;
+  word-break: break-word;
+  text-align: left;
 }
 
 /* Responsive Design for Smaller Screens (Mobile) */
 @media (max-width: 600px) {
-    .App {
-        padding: 5px;
-    }
+  .App {
+    padding: 5px;
+  }
 
-    h1 {
-        font-size: 18px; /* Smaller title font size */
-    }
+  h1 {
+    font-size: 18px;
+  }
 
-    .scanner-video {
-        max-height: calc(40vh); /* Limit video height to fit smaller screens */
-    }
+  .scanner-video {
+    max-height: calc(40vh);
+  }
 
-    .start-scan-button {
-        width: calc(100% -20 px)
+  .start-scan-button {
+    width: calc(100% - 20px);
+    padding: 8px 16px;
+  }
+
+  .result-container {
+    padding: 8px;
+  }
+}
