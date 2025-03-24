@@ -1,4 +1,13 @@
-# Getting Started with Create React App
+
+# Scan a QRcode generated from a mautic URL and get lead id
+
+# publish app
+
+Publish app to github pages
+
+### `npm run deploy`
+
+# Default documentation for Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
