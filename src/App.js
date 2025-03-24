@@ -111,6 +111,8 @@ function App() {
                 return {
                     lead: deserialized.lead.toString(),
                     host: urlObj.host,
+                    path: urlObj.pathname,
+                    params: Object.fromEntries(urlObj.searchParams.entries()),
                     fullUrl: url
                 };
             } else {
@@ -190,11 +192,18 @@ function App() {
                             className="url-toggle" 
                             onClick={() => setExpanded(!expanded)}
                         >
-                            {expanded ? '▼' : '▶'} Full URL
+                            {expanded ? '▼' : '▶'} Details
                         </button>
-                        <div className={`full-url ${expanded ? 'expanded' : ''}`}>
-                            {result.fullUrl}
-                        </div>
+                        {expanded && (
+                            <div className="full-url expanded">
+                                <div>Path: {result.path}</div>
+                                {Object.entries(result.params).map(([key, value]) => 
+                                    key !== 'ct' && <div key={key}>{key}: {value}</div>
+                                )}
+                                <div style={{marginTop: '10px'}}>Full URL:</div>
+                                <div>{result.fullUrl}</div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
