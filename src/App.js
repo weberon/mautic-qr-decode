@@ -6,68 +6,77 @@ function phpUnserialize(data) {
     let index = 0;
 
     function parseValue() {
+        if (index >= data.length) return null;
         const dataType = data[index];
         index++;
 
         switch (dataType) {
-            case 'i':
-                const intMatch = data.slice(index).match(/^:(\d+);/);
+            case 'i': { // Integer
+                const intMatch = data.slice(index).match(/^:(-?\d+);/);
                 if (intMatch) {
                     index += intMatch[0].length;
                     return parseInt(intMatch[1], 10);
                 }
                 break;
-            case 'd':
-                const floatMatch = data.slice(index).match(/^:(\d+\.?\d*);/);
+            }
+            case 'd': { // Double
+                const floatMatch = data.slice(index).match(/^:([+-]?\d+\.?\d*);/);
                 if (floatMatch) {
                     index += floatMatch[0].length;
                     return parseFloat(floatMatch[1]);
                 }
                 break;
-            case 'b':
+            }
+            case 'b': { // Boolean
                 const boolMatch = data.slice(index).match(/^:([01]);/);
                 if (boolMatch) {
                     index += boolMatch[0].length;
                     return boolMatch[1] === '1';
                 }
                 break;
-            case 's':
-                const strLenMatch = data.slice(index).match(/^:(\d+):/);
+            }
+            case 's': { // String
+                const strLenMatch = data.slice(index).match(/^:(\d+):"/);
                 if (strLenMatch) {
                     const strLen = parseInt(strLenMatch[1], 10);
                     index += strLenMatch[0].length;
-                    const str = data.slice(index, index + strLen);
-                    index += strLen + 2; // +2 for closing quote and semicolon
+                    const str = data.substr(index, strLen);
+                    index += strLen + 2; // Skip string and closing ";
                     return str;
                 }
                 break;
-            case 'a':
-                const result = {};
+            }
+            case 'a': { // Array
                 const arrLenMatch = data.slice(index).match(/^:(\d+):{/);
                 if (arrLenMatch) {
                     index += arrLenMatch[0].length;
                     const arrLen = parseInt(arrLenMatch[1], 10);
+                    const result = {};
                     for (let i = 0; i < arrLen; i++) {
                         const key = parseValue();
                         const value = parseValue();
                         result[key] = value;
                     }
-                    index++; // Skip closing '}'
+                    if (data[index] === '}') index++;
                     return result;
                 }
                 break;
-            case 'N':
-                index += 1; // Skip semicolon
+            }
+            case 'N': // Null
+                index++;
                 return null;
-            case '}':
-                // End of an array, just return undefined
-                return undefined;
             default:
-                throw new Error(`Unsupported data type or format at position ${index}: ${data.slice(index, index + 10)}...`);
+                throw new Error(`Unsupported data type '${dataType}' at position ${index-1}`);
         }
+        throw new Error(`Parse error at position ${index-1}`);
     }
 
-    return parseValue();
+    try {
+        return parseValue();
+    } catch (e) {
+        console.error("Unserialize error:", e);
+        return null;
+    }
 }
 
 function App() {
