@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/mautic-qr-decode/static/css/main.53fcce21.css",
+    "main.css": "/mautic-qr-decode/static/css/main.6e475b49.css",
     "main.js": "/mautic-qr-decode/static/js/main.afc4cd4d.js",
     "static/js/451.9d8eff6a.chunk.js": "/mautic-qr-decode/static/js/451.9d8eff6a.chunk.js",
     "static/js/453.71a89bb6.chunk.js": "/mautic-qr-decode/static/js/453.71a89bb6.chunk.js",
     "index.html": "/mautic-qr-decode/index.html",
-    "main.53fcce21.css.map": "/mautic-qr-decode/static/css/main.53fcce21.css.map",
+    "main.6e475b49.css.map": "/mautic-qr-decode/static/css/main.6e475b49.css.map",
     "main.afc4cd4d.js.map": "/mautic-qr-decode/static/js/main.afc4cd4d.js.map",
     "451.9d8eff6a.chunk.js.map": "/mautic-qr-decode/static/js/451.9d8eff6a.chunk.js.map",
     "453.71a89bb6.chunk.js.map": "/mautic-qr-decode/static/js/453.71a89bb6.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.53fcce21.css",
+    "static/css/main.6e475b49.css",
     "static/js/main.afc4cd4d.js"
   ]
 }
