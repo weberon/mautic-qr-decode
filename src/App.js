@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import QrScanner from "qr-scanner";
 import './App.css';
 
@@ -11,28 +11,28 @@ function phpUnserialize(data) {
 
         switch (dataType) {
             case 'i':
-                const intMatch = data.slice(index).match(/^\:(\d+)\;/);
+                const intMatch = data.slice(index).match(/^:(\d+);/);
                 if (intMatch) {
                     index += intMatch[0].length;
                     return parseInt(intMatch[1], 10);
                 }
                 break;
             case 'd':
-                const floatMatch = data.slice(index).match(/^\:(\d+\.?\d*)\;/);
+                const floatMatch = data.slice(index).match(/^:(\d+\.?\d*);/);
                 if (floatMatch) {
                     index += floatMatch[0].length;
                     return parseFloat(floatMatch[1]);
                 }
                 break;
             case 'b':
-                const boolMatch = data.slice(index).match(/^\:([01])\;/);
+                const boolMatch = data.slice(index).match(/^:([01]);/);
                 if (boolMatch) {
                     index += boolMatch[0].length;
                     return boolMatch[1] === '1';
                 }
                 break;
             case 's':
-                const strLenMatch = data.slice(index).match(/^\:(\d+)\:"/);
+                const strLenMatch = data.slice(index).match(/^:(\d+):/);
                 if (strLenMatch) {
                     const strLen = parseInt(strLenMatch[1], 10);
                     index += strLenMatch[0].length;
@@ -43,7 +43,7 @@ function phpUnserialize(data) {
                 break;
             case 'a':
                 const result = {};
-                const arrLenMatch = data.slice(index).match(/^\:(\d+)\:\{/);
+                const arrLenMatch = data.slice(index).match(/^:(\d+):{/);
                 if (arrLenMatch) {
                     index += arrLenMatch[0].length;
                     const arrLen = parseInt(arrLenMatch[1], 10);
@@ -62,20 +62,25 @@ function phpUnserialize(data) {
             case '}':
                 // End of an array, just return undefined
                 return undefined;
+            default:
+                throw new Error(`Unsupported data type or format at position ${index}: ${data.slice(index, index + 10)}...`);
         }
-        throw new Error(`Unsupported data type or format at position ${index}: ${data.slice(index, index + 10)}...`);
     }
 
     return parseValue();
 }
 
 function App() {
-  const [result, setResult] = useState("");
-  const [expanded, setExpanded] = useState(false);
-  // ... other state and functions
+    const [result, setResult] = useState(null);
+    const [isScanning, setIsScanning] = useState(false);
+    const [expanded, setExpanded] = useState(false);
+    const videoRef = useRef(null);
+    const scannerRef = useRef(null);
 
-  const processUrl = (url) => {
-    try {
+    const processUrl = useCallback((url) => {
+        console.log("Processing URL:", url);
+
+        try {
             const urlObj = new URL(url);
             console.log("Parsed URL:", urlObj.toString());
 
@@ -94,23 +99,21 @@ function App() {
             console.log("PHP deserialized:", deserialized);
 
             if (typeof deserialized === 'object' && 'lead' in deserialized) {
-                return deserialized.lead.toString();
+                return {
+                    lead: deserialized.lead.toString(),
+                    host: urlObj.host,
+                    fullUrl: url
+                };
             } else {
                 throw new Error("'lead' key not found in deserialized data");
             }
-      // Return an object with all values
-      return {
-        lead: deserialized.lead.toString(),
-        host: urlObj.host,
-        fullUrl: url
-      };
-    } catch (error) {
-      return { error: error.message };
-    }
-  };
+        } catch (error) {
+            console.error("Processing error:", error);
+            return { error: error.message };
+        }
+    }, []);
 
-
-    const startScanner = () => {
+    const startScanner = useCallback(() => {
         if (scannerRef.current) {
             scannerRef.current.start();
             return;
@@ -128,19 +131,19 @@ function App() {
                     setResult(processedResult);
                 } else {
                     console.error("Invalid QR code data:", result);
-                    setResult("Error: Invalid QR code data format");
+                    setResult({ error: "Invalid QR code data format" });
                 }
             },
             { highlightScanRegion: true, highlightCodeOutline: true }
         );
 
         scannerRef.current.start();
-    };
+    }, [processUrl]);
 
-    const handleStartScanning = () => {
+    const handleStartScanning = useCallback(() => {
         setIsScanning(true);
         startScanner();
-    };
+    }, [startScanner]);
 
     useEffect(() => {
         if (isScanning) {
@@ -152,42 +155,48 @@ function App() {
                 scannerRef.current = null;
             }
         };
-    }, [isScanning]);
+    }, [isScanning, startScanner]);
 
-  return (
-    <div className="App">
-      <h1>QR Code Processor</h1>
-      <video ref={videoRef} className="scanner-video" muted playsInline />
-      {!isScanning && (
-        <div className="button-container">
-          <button className="start-scan-button" onClick={handleStartScanning}>
-            Start Scanning
-          </button>
+    return (
+        <div className="App">
+            <h1>QR Code Processor</h1>
+            <video ref={videoRef} className="scanner-video" muted playsInline />
+            {!isScanning && (
+                <div className="button-container">
+                    <button className="start-scan-button" onClick={handleStartScanning}>
+                        Start Scanning
+                    </button>
+                </div>
+            )}
+            
+            {result && !result.error && (
+                <div className="result-container">
+                    <div className="result-header">
+                        <div className="host-port">Host: {result.host}</div>
+                        <div className="lead-id">Lead ID: {result.lead}</div>
+                    </div>
+                    
+                    <div className="url-section">
+                        <button 
+                            className="url-toggle" 
+                            onClick={() => setExpanded(!expanded)}
+                        >
+                            {expanded ? '▼' : '▶'} Full URL
+                        </button>
+                        <div className={`full-url ${expanded ? 'expanded' : ''}`}>
+                            {result.fullUrl}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {result && result.error && (
+                <div className="result-container error">
+                    <div className="error-message">{result.error}</div>
+                </div>
+            )}
         </div>
-      )}
-      
-      {result && (
-        <div className="result-container">
-          <div className="result-header">
-            <div className="host-port">Host: {result.host}</div>
-            <div className="lead-id">Lead ID: {result.lead}</div>
-          </div>
-          
-          <div className="url-section">
-            <button 
-              className="url-toggle" 
-              onClick={() => setExpanded(!expanded)}
-            >
-              {expanded ? '▼' : '▶'} Full URL
-            </button>
-            <div className={`full-url ${expanded ? 'expanded' : ''}`}>
-              {result.fullUrl}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+    );
 }
 
 export default App;
