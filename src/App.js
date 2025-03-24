@@ -70,15 +70,12 @@ function phpUnserialize(data) {
 }
 
 function App() {
-    const [result, setResult] = useState("");
-    const [isScanning, setIsScanning] = useState(false);
-    const videoRef = useRef(null);
-    const scannerRef = useRef(null);
+  const [result, setResult] = useState("");
+  const [expanded, setExpanded] = useState(false);
+  // ... other state and functions
 
-    const processUrl = (url) => {
-        console.log("Processing URL:", url);
-
-        try {
+  const processUrl = (url) => {
+    try {
             const urlObj = new URL(url);
             console.log("Parsed URL:", urlObj.toString());
 
@@ -101,11 +98,17 @@ function App() {
             } else {
                 throw new Error("'lead' key not found in deserialized data");
             }
-        } catch (error) {
-            console.error("Processing error:", error);
-            return `Processing Error: ${error.message}`;
-        }
-    };
+      // Return an object with all values
+      return {
+        lead: deserialized.lead.toString(),
+        host: urlObj.host,
+        fullUrl: url
+      };
+    } catch (error) {
+      return { error: error.message };
+    }
+  };
+
 
     const startScanner = () => {
         if (scannerRef.current) {
@@ -151,25 +154,40 @@ function App() {
         };
     }, [isScanning]);
 
-    return (
-        <div className="App">
-            <h1>QR Code Processor</h1>
-            <video ref={videoRef} className="scanner-video" muted playsInline />
-            {!isScanning && (
-                <div className="button-container">
-                    <button className="start-scan-button" onClick={handleStartScanning}>
-                        Start Scanning
-                    </button>
-                </div>
-            )}
-            <div className="result-container">
-                <h2>Lead Value:</h2>
-                <pre className="result-output">
-                    {result || "Waiting for QR code..."}
-                </pre>
-            </div>
+  return (
+    <div className="App">
+      <h1>QR Code Processor</h1>
+      <video ref={videoRef} className="scanner-video" muted playsInline />
+      {!isScanning && (
+        <div className="button-container">
+          <button className="start-scan-button" onClick={handleStartScanning}>
+            Start Scanning
+          </button>
         </div>
-    );
+      )}
+      
+      {result && (
+        <div className="result-container">
+          <div className="result-header">
+            <div className="host-port">Host: {result.host}</div>
+            <div className="lead-id">Lead ID: {result.lead}</div>
+          </div>
+          
+          <div className="url-section">
+            <button 
+              className="url-toggle" 
+              onClick={() => setExpanded(!expanded)}
+            >
+              {expanded ? '▼' : '▶'} Full URL
+            </button>
+            <div className={`full-url ${expanded ? 'expanded' : ''}`}>
+              {result.fullUrl}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default App;
