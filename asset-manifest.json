@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/mautic-qr-decode/static/css/main.2a5a5f43.css",
-    "main.js": "/mautic-qr-decode/static/js/main.35a633bc.js",
+    "main.css": "/mautic-qr-decode/static/css/main.60ed215c.css",
+    "main.js": "/mautic-qr-decode/static/js/main.4ead88f0.js",
     "static/js/451.9d8eff6a.chunk.js": "/mautic-qr-decode/static/js/451.9d8eff6a.chunk.js",
     "static/js/453.71a89bb6.chunk.js": "/mautic-qr-decode/static/js/453.71a89bb6.chunk.js",
     "index.html": "/mautic-qr-decode/index.html",
-    "main.2a5a5f43.css.map": "/mautic-qr-decode/static/css/main.2a5a5f43.css.map",
-    "main.35a633bc.js.map": "/mautic-qr-decode/static/js/main.35a633bc.js.map",
+    "main.60ed215c.css.map": "/mautic-qr-decode/static/css/main.60ed215c.css.map",
+    "main.4ead88f0.js.map": "/mautic-qr-decode/static/js/main.4ead88f0.js.map",
     "451.9d8eff6a.chunk.js.map": "/mautic-qr-decode/static/js/451.9d8eff6a.chunk.js.map",
     "453.71a89bb6.chunk.js.map": "/mautic-qr-decode/static/js/453.71a89bb6.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.2a5a5f43.css",
-    "static/js/main.35a633bc.js"
+    "static/css/main.60ed215c.css",
+    "static/js/main.4ead88f0.js"
   ]
 }
