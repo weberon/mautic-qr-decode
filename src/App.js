@@ -143,7 +143,7 @@ function App() {
                 host: urlObj.host,
                 path: urlObj.pathname,
                 params: Object.fromEntries(urlObj.searchParams.entries()),
-                fullUrl: url,
+                fullUrl: urlObj.href,
                 deserialized: deserialized,
                 ctError: ctError
             };
@@ -198,80 +198,103 @@ function App() {
     }, [isScanning, startScanner]);
 
     return (
-        <div className="App">
-            <div className="app-header">
-                <h2>Decode QR Code</h2>
-                <button className="help-icon" onClick={() => setShowHelp(!showHelp)}>
-                    <img src={helpIcon} alt="Help" />
-                </button>
-            </div>
+	<div className="App">
+	  <div className="app-header">
+	    <h2>Decode QR Code</h2>
+	    <button className="help-icon" onClick={() => setShowHelp(true)}>
+	      <img src={helpIcon} alt="Help" />
+	    </button>
+	  </div>
 
-            <video ref={videoRef} className="scanner-video" muted playsInline />         
-            {!isScanning && (
-                <div className="button-container">
-                    <button className="start-scan-button" onClick={handleStartScanning}>
-                        Start Scanning
-                    </button>
-                </div>
-            )}
+	  <video ref={videoRef} className="scanner-video" muted playsInline />
+	  
+	  {!isScanning && (
+	    <div className="button-container">
+	      <button className="start-scan-button" onClick={handleStartScanning}>
+		Start Scanning
+	      </button>
+	    </div>
+	  )}
 
-            {result && !result.error && (
-                <div className="result-container">
-                    <div className="result-header">
-                        <div className="host-port">Host: {result.host}</div>
-                        <div className="lead-id">Lead ID: {result.lead || "N/A"}</div>
-                    </div>
-                    
-                    <div className="url-section">
-                        <button 
-                            className="url-toggle" 
-                            onClick={() => setExpanded(!expanded)}
-                        >
-                            {expanded ? '▼' : '▶'} Details
-                        </button>
-                        {expanded && (
-                            <div className="full-url expanded">
-                                {result.ctError ? (
-                                    <div style={{color: 'red'}}>Error processing 'ct' parameter: {result.ctError}</div>
-                                ) : result.deserialized ? (
-                                    <>
-                                        <div>Deserialized Data:</div>
-                                        {Object.entries(result.deserialized).map(([key, value]) => (
-                                            <div key={key}>{key}: {JSON.stringify(value)}</div>
-                                        ))}
-                                    </>
-                                ) : (
-                                    <div>Deserialized Data: N/A</div>
-                                )}
-                                <div style={{marginTop: '10px'}}>Path: {result.path}</div>
-                                {Object.entries(result.params).map(([key, value]) => 
-                                    <div key={key}>{key}: {value}</div>
-                                )}
-                                <div style={{marginTop: '10px'}}>Full URL:</div>
-                                <div>{result.fullUrl}</div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
+	  {result && !result.error && (
+	    <div className="result-container">
+	      <div className="result-header">
+		<div className="host-port">Host: {result.host}</div>
+		<div className="lead-id">Lead ID: {result.lead || "N/A"}</div>
+	      </div>
+	      
+	      <div className="url-section">
+		<button 
+		  className="url-toggle" 
+		  onClick={() => setExpanded(!expanded)}
+		>
+		  {expanded ? '▼ Hide Details' : '▶ Show Details'}
+		</button>
+		{expanded && (
+		  <div className="full-url expanded">
+		    {/* Deserialized Data Section */}
+		    {result.ctError ? (
+		      <div className="error-message">Error processing 'ct' parameter: {result.ctError}</div>
+		    ) : result.deserialized ? (
+		      <>
+			<div className="section-title">Deserialized Data:</div>
+			<pre className="data-display">
+			  {JSON.stringify(result.deserialized, null, 2)}
+			</pre>
+		      </>
+		    ) : (
+		      <div>No deserialized data available</div>
+		    )}
 
-            {result?.error && (
-                <div className="result-container error">
-                    <div className="error-message">{result.error}</div>
-                </div>
-            )}
+		    {/* URL Display Section - Fixed to show full URL */}
+		    <div className="url-display-section">
+		      <div className="section-title">URL Information</div>
+		      <div className="url-row">
+			<span className="url-label">Full URL:</span>
+			<span className="url-value full-url-value">{result.fullUrl || "No URL available"}</span>
+		      </div>
+		      <div className="url-row">
+			<span className="url-label">Path:</span>
+			<span className="url-value">{result.path}</span>
+		      </div>
+		      
+		      <div className="section-title">Parameters:</div>
+		      {Object.entries(result.params).map(([key, value]) => (
+			<div className="url-row" key={key}>
+			  <span className="url-label">{key}:</span>
+			  <span className="url-value">{value}</span>
+			</div>
+		      ))}
+		    </div>
+		  </div>
+		)}
+	      </div>
+	    </div>
+	  )}
 
-            {showHelp && (
-                <div className="help-popup">
-                    <div className="help-content">
-                        <button className="close-help" onClick={() => setShowHelp(false)}>
-                            ×
-                        </button>
-                        <ReactMarkdown>{documentation}</ReactMarkdown>
-                    </div>
-                </div>
-            )}
-        </div>
+	  {result?.error && (
+	    <div className="result-container error">
+	      <div className="error-message">{result.error}</div>
+	      {result.fullUrl && (
+		<div className="scanned-data">
+		  <div>Scanned Data:</div>
+		  <div className="url-value">{result.fullUrl}</div>
+		</div>
+	      )}
+	    </div>
+	  )}
+
+	  {showHelp && (
+	    <div className="help-popup">
+	      <div className="help-content">
+		<button className="close-help" onClick={() => setShowHelp(false)}>
+		  ×
+		</button>
+		<ReactMarkdown>{documentation}</ReactMarkdown>
+	      </div>
+	    </div>
+	  )}
+	</div>
     );
 }
 
