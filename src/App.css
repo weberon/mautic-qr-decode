@@ -136,3 +136,84 @@
   max-width: 100%;
   max-height: 100%;
 }
+
+/* Existing styles (keep all current working styles) */
+
+/* Add these new styles at the bottom */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.help-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.help-icon img {
+  width: 24px;
+  height: 24px;
+  opacity: 0.7;
+}
+
+.help-icon:hover img {
+  opacity: 1;
+}
+
+.help-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.help-content {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close-help {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+}
+
+.help-content h1, 
+.help-content h2 {
+  color: #333;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.help-content p {
+  margin-bottom: 1em;
+  line-height: 1.5;
+}
+
+.help-content ul {
+  padding-left: 20px;
+  margin-bottom: 1em;
+}

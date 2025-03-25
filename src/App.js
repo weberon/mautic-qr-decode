@@ -1,6 +1,27 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import QrScanner from "qr-scanner";
 import './App.css';
+import helpIcon from './help-icon.svg';
+import ReactMarkdown from 'react-markdown';
+
+const documentation = `
+# QR Code Decoder Help
+
+## How to Use
+1. Click "Start Scanning" to activate your camera
+2. Point your camera at a QR code
+3. View the decoded information
+
+## Understanding Results
+- **Host**: The website domain
+- **Lead ID**: The extracted identifier (if available)
+- **Details**: Click to expand for more technical information
+
+## Troubleshooting
+- Ensure camera permissions are allowed
+- Try better lighting if scanning fails
+- Clean your camera lens if needed
+`;
 
 function phpUnserialize(data) {
     let index = 0;
@@ -83,6 +104,7 @@ function App() {
     const [result, setResult] = useState(null);
     const [isScanning, setIsScanning] = useState(false);
     const [expanded, setExpanded] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
     const videoRef = useRef(null);
     const scannerRef = useRef(null);
 
@@ -177,8 +199,14 @@ function App() {
 
     return (
         <div className="App">
-            <h2>Decode QR Code</h2>
-            <video ref={videoRef} className="scanner-video" muted playsInline />
+            <div className="app-header">
+                <h2>Decode QR Code</h2>
+                <button className="help-icon" onClick={() => setShowHelp(!showHelp)}>
+                    <img src={helpIcon} alt="Help" />
+                </button>
+            </div>
+
+            <video ref={videoRef} className="scanner-video" muted playsInline />         
             {!isScanning && (
                 <div className="button-container">
                     <button className="start-scan-button" onClick={handleStartScanning}>
@@ -230,6 +258,17 @@ function App() {
             {result?.error && (
                 <div className="result-container error">
                     <div className="error-message">{result.error}</div>
+                </div>
+            )}
+
+            {showHelp && (
+                <div className="help-popup">
+                    <div className="help-content">
+                        <button className="close-help" onClick={() => setShowHelp(false)}>
+                            ×
+                        </button>
+                        <ReactMarkdown>{documentation}</ReactMarkdown>
+                    </div>
                 </div>
             )}
         </div>
