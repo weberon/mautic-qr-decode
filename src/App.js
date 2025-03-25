@@ -94,31 +94,37 @@ function App() {
             console.log("Parsed URL:", urlObj.toString());
 
             let ct = urlObj.searchParams.get("ct");
-            if (!ct) {
-                throw new Error("'ct' parameter not found in URL");
+            let deserialized = null;
+            let lead = null;
+            let ctError = null;
+
+            if (ct) {
+                try {
+                    ct = ct.replace(/&$/, '');
+                    console.log("Extracted 'ct' parameter:", ct);
+
+                    const decoded = atob(ct);
+                    console.log("Base64 decoded:", decoded);
+
+                    deserialized = phpUnserialize(decoded);
+                    console.log("PHP deserialized:", deserialized);
+
+                    lead = deserialized?.lead?.toString() || null;
+                } catch (error) {
+                    console.error("Error processing 'ct' parameter:", error);
+                    ctError = error.message;
+                }
             }
 
-            ct = ct.replace(/&$/, '');
-            console.log("Extracted 'ct' parameter:", ct);
-
-            const decoded = atob(ct);
-            console.log("Base64 decoded:", decoded);
-
-            const deserialized = phpUnserialize(decoded);
-            console.log("PHP deserialized:", deserialized);
-
-            if (typeof deserialized === 'object' && 'lead' in deserialized) {
-                return {
-                    lead: deserialized.lead.toString(),
-                    host: urlObj.host,
-                    path: urlObj.pathname,
-                    params: Object.fromEntries(urlObj.searchParams.entries()),
-                    fullUrl: url,
-                    deserialized: deserialized  // Include the full deserialized data
-                };
-            } else {
-                throw new Error("'lead' key not found in deserialized data");
-            }
+            return {
+                lead: lead,
+                host: urlObj.host,
+                path: urlObj.pathname,
+                params: Object.fromEntries(urlObj.searchParams.entries()),
+                fullUrl: url,
+                deserialized: deserialized,
+                ctError: ctError
+            };
         } catch (error) {
             console.error("Processing error:", error);
             return { error: error.message };
@@ -158,21 +164,14 @@ function App() {
     }, [startScanner]);
 
     useEffect(() => {
-        if (isScanning) {
-            startScanner();
-        }
-        return () => {
-            if (scannerRef.current) {
-                scannerRef.current.destroy();
-                scannerRef.current = null;
-            }
-        };
+        if (isScanning) startScanner();
+        return () => scannerRef.current?.destroy();
     }, [isScanning, startScanner]);
 
     return (
         <div className="App">
             <h2>Decode QR Code</h2>
-            <video ref={videoRef} className="scanner-video" muted playsInline />
+            <video ref={videoRef} className="scanner-video" muted playsInline />        
             {!isScanning && (
                 <div className="button-container">
                     <button className="start-scan-button" onClick={handleStartScanning}>
@@ -180,12 +179,12 @@ function App() {
                     </button>
                 </div>
             )}
-            
+
             {result && !result.error && (
                 <div className="result-container">
                     <div className="result-header">
                         <div className="host-port">Host: {result.host}</div>
-                        <div className="lead-id">Lead ID: {result.lead}</div>
+                        <div className="lead-id">Lead ID: {result.lead || "N/A"}</div>
                     </div>
                     
                     <div className="url-section">
@@ -197,13 +196,21 @@ function App() {
                         </button>
                         {expanded && (
                             <div className="full-url expanded">
-                                <div>Deserialized Data:</div>
-                                {Object.entries(result.deserialized).map(([key, value]) => (
-                                    <div key={key}>{key}: {JSON.stringify(value)}</div>
-                                ))}
+                                {result.ctError ? (
+                                    <div style={{color: 'red'}}>Error processing 'ct' parameter: {result.ctError}</div>
+                                ) : result.deserialized ? (
+                                    <>
+                                        <div>Deserialized Data:</div>
+                                        {Object.entries(result.deserialized).map(([key, value]) => (
+                                            <div key={key}>{key}: {JSON.stringify(value)}</div>
+                                        ))}
+                                    </>
+                                ) : (
+                                    <div>Deserialized Data: N/A</div>
+                                )}
                                 <div style={{marginTop: '10px'}}>Path: {result.path}</div>
                                 {Object.entries(result.params).map(([key, value]) => 
-                                    key !== 'ct' && <div key={key}>{key}: {value}</div>
+                                    <div key={key}>{key}: {value}</div>
                                 )}
                                 <div style={{marginTop: '10px'}}>Full URL:</div>
                                 <div>{result.fullUrl}</div>
@@ -213,7 +220,7 @@ function App() {
                 </div>
             )}
 
-            {result && result.error && (
+            {result?.error && (
                 <div className="result-container error">
                     <div className="error-message">{result.error}</div>
                 </div>
