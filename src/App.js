@@ -164,14 +164,21 @@ function App() {
     }, [startScanner]);
 
     useEffect(() => {
-        if (isScanning) startScanner();
-        return () => scannerRef.current?.destroy();
+        if (isScanning) {
+            startScanner();
+        }
+        return () => {
+            if (scannerRef.current) {
+                scannerRef.current.destroy();
+                scannerRef.current = null;
+            }
+        };
     }, [isScanning, startScanner]);
 
     return (
         <div className="App">
             <h2>Decode QR Code</h2>
-            <video ref={videoRef} className="scanner-video" muted playsInline />        
+            <video ref={videoRef} className="scanner-video" muted playsInline />
             {!isScanning && (
                 <div className="button-container">
                     <button className="start-scan-button" onClick={handleStartScanning}>
